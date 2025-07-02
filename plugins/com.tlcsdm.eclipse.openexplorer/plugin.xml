@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="com.tlcsdm.eclipse.openexplorer.actionSet"
+            label="OpenExplorer Action Set"
+            visible="true">
+         <action
+               class="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorerAction"
+               icon="icons/openexplorer16.png"
+               id="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorer"
+               label="&amp;OpenExplorer Action"
+               toolbarPath="OpenExplorer"
+               tooltip="Open Explorer">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+         <objectContribution
+            objectClass="org.eclipse.core.runtime.IAdaptable"
+            id="com.tlcsdm.eclipse.openexplorer.popupMenuContribution">
+         <action
+               label="Open Explorer"
+               icon="icons/openexplorer16.png"
+               class="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorerPopupAction"
+               menubarPath="additions"
+               enablesFor="*"
+               id="com.tlcsdm.eclipse.openexplorer.popupMenuAction">
+         </action>
+      </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            name="Open Explorer"
+            class="com.tlcsdm.eclipse.openexplorer.preferences.HomePreferencePage"
+            id="com.tlcsdm.eclipse.openexplorer.preferences.HomePreferencePage">
+      </page>
+      <page
+            id="com.tlcsdm.eclipse.openexplorer.preferences.FMPreferencePage"
+            class="com.tlcsdm.eclipse.openexplorer.preferences.FMPreferencePage"
+            name="File Manager"
+            category="com.tlcsdm.eclipse.openexplorer.preferences.HomePreferencePage">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="com.tlcsdm.eclipse.openexplorer.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+</plugin>
