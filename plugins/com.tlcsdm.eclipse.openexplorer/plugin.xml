@@ -49,8 +49,9 @@
             </menuContribution>
 
             <!-- Toolbar buttons -->
-            <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+            <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?befor=additions">
                   <toolbar id="com.tlcsdm.eclipse.openexplorer.toolbar">
+                        <separator name="com.tlcsdm.eclipse.openexplorer.group.openexplorer" visible="true"/>
                         <command commandId="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorer"
                               label="Open Explorer" icon="icons/openexplorer16.png" style="push" />
                   </toolbar>
