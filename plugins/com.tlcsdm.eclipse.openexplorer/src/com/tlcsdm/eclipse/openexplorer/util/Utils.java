@@ -71,7 +71,8 @@ public class Utils {
 	public static String executeCommand(String command) {
 		String stdout = null;
 		try {
-			Process process = Runtime.getRuntime().exec(command);
+			ProcessBuilder builder = new ProcessBuilder(command.split(" "));
+			Process process = builder.start();
 			stdout = IOUtils.toString(process.getInputStream());
 			stdout = stdout.trim();
 			stdout = stdout.replace("\n", "");
