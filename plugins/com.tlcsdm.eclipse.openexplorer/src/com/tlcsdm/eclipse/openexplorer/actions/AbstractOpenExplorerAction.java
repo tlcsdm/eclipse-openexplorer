@@ -25,6 +25,9 @@ package com.tlcsdm.eclipse.openexplorer.actions;
 
 import java.io.IOException;
 
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaElement;
@@ -37,11 +40,13 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.tlcsdm.eclipse.openexplorer.Activator;
 import com.tlcsdm.eclipse.openexplorer.util.Messages;
@@ -51,7 +56,8 @@ import com.tlcsdm.eclipse.openexplorer.util.OperatingSystem;
  * @author <a href="mailto:samson959@gmail.com">Samson Wu</a>
  * @version 1.4.0
  */
-public abstract class AbstractOpenExplorerAction implements IActionDelegate, IPropertyChangeListener {
+public abstract class AbstractOpenExplorerAction extends AbstractHandler
+		implements IActionDelegate, IPropertyChangeListener {
 	protected IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 	protected Shell shell;
 	protected ISelection currentSelection;
@@ -138,12 +144,65 @@ public abstract class AbstractOpenExplorerAction implements IActionDelegate, IPr
 				Runtime.getRuntime().exec(new String[] { browser, location });
 			}
 		} catch (IOException e) {
-			MessageDialog.openError(shell, Messages.OpenExploer_Error, Messages.Cant_Open + " \"" + location + "\"");
+			MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.OpenExploer_Error,
+					Messages.Cant_Open + " \"" + location + "\"");
 			e.printStackTrace();
 		}
 	}
 
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.currentSelection = selection;
+	}
+
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+
+		if (selection == null || selection.isEmpty()) {
+			return null;
+		}
+
+		if (selection instanceof ITreeSelection) {
+			ITreeSelection treeSelection = (ITreeSelection) selection;
+
+			for (TreePath path : treeSelection.getPaths()) {
+				IResource resource = null;
+				Object segment = path.getLastSegment();
+				if (segment instanceof IResource) {
+					resource = (IResource) segment;
+				} else if (segment instanceof IJavaElement) {
+					resource = ((IJavaElement) segment).getResource();
+				}
+
+				if (resource == null)
+					continue;
+
+				String browser = this.systemBrowser;
+				String location = resource.getLocation().toOSString();
+				if (resource instanceof IFile) {
+					location = ((IFile) resource).getParent().getLocation().toOSString();
+					if (OperatingSystem.INSTANCE.isWindows()) {
+						browser = this.systemBrowser + " /select,";
+						location = ((IFile) resource).getLocation().toOSString();
+					}
+				}
+				openInBrowser(browser, location);
+			}
+		} else if (selection instanceof ITextSelection || selection instanceof IStructuredSelection) {
+			IEditorPart editor = HandlerUtil.getActiveEditor(event);
+			if (editor != null) {
+				IFile currentFile = editor.getEditorInput().getAdapter(IFile.class);
+				if (currentFile != null) {
+					String browser = this.systemBrowser;
+					String location = currentFile.getParent().getLocation().toOSString();
+					if (OperatingSystem.INSTANCE.isWindows()) {
+						browser = this.systemBrowser + " /select,";
+						location = currentFile.getLocation().toOSString();
+					}
+					openInBrowser(browser, location);
+				}
+			}
+		}
+		return null;
 	}
 }
