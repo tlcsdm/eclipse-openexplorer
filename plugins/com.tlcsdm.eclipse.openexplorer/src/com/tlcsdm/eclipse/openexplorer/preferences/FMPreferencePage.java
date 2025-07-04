@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
 
 import com.tlcsdm.eclipse.openexplorer.Activator;
 import com.tlcsdm.eclipse.openexplorer.util.IFileManagerExecutables;
@@ -88,6 +89,7 @@ public class FMPreferencePage extends PreferencePage implements IWorkbenchPrefer
 		createMacOSXFMGroup(composite);
 		createWindowsFMGroup(composite);
 		createLinuxFMGroup(composite);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".prefs_openexplorer");
 		return composite;
 	}
 

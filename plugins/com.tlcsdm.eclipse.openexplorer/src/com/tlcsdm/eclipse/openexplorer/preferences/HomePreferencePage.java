@@ -33,6 +33,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
 
 import com.tlcsdm.eclipse.openexplorer.Activator;
 import com.tlcsdm.eclipse.openexplorer.util.Messages;
@@ -66,6 +67,7 @@ public class HomePreferencePage extends PreferencePage implements IWorkbenchPref
 	protected Control createContents(Composite parent) {
 		Composite composite = createComposite(parent);
 		createLabel(composite, Messages.Expand_Instruction);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, Activator.PLUGIN_ID + ".prefs_openexplorer");
 		return composite;
 	}
 

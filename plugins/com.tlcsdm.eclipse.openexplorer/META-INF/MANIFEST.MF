@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Automatic-Module-Name: com.tlcsdm.eclipse.openexplorer
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.tlcsdm.eclipse.openexplorer;singleton:=true
-Bundle-Version: 1.0.1
+Bundle-Version: 1.0.2
 Bundle-Activator: com.tlcsdm.eclipse.openexplorer.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.ui,

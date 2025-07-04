@@ -1,61 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-      <extension point="org.eclipse.ui.preferencePages">
-            <page name="Open Explorer"
-                  class="com.tlcsdm.eclipse.openexplorer.preferences.HomePreferencePage"
-                  id="com.tlcsdm.eclipse.openexplorer.preferences.HomePreferencePage">
-            </page>
-            <page id="com.tlcsdm.eclipse.openexplorer.preferences.FMPreferencePage"
-                  class="com.tlcsdm.eclipse.openexplorer.preferences.FMPreferencePage"
-                  name="File Manager"
-                  category="com.tlcsdm.eclipse.openexplorer.preferences.HomePreferencePage">
-            </page>
-      </extension>
-      <extension point="org.eclipse.core.runtime.preferences">
-            <initializer class="com.tlcsdm.eclipse.openexplorer.preferences.PreferenceInitializer">
-            </initializer>
-      </extension>
-      <extension point="org.eclipse.ui.commands">
-            <category id="com.tlcsdm.eclipse.openexplorer.Category" name="Open Explorer">
-            </category>
-            <command categoryId="com.tlcsdm.eclipse.openexplorer.Category"
-                  defaultHandler="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorerAction"
-                  id="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorer"
-                  name="&amp;OpenExplorer Action">
-            </command>
-            <command categoryId="com.tlcsdm.eclipse.openexplorer.Category"
-                  defaultHandler="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorerPopupAction"
-                  id="com.tlcsdm.eclipse.openexplorer.actions.popupMenuAction" name="Open Explorer">
-            </command>
-      </extension>
-      <extension point="org.eclipse.ui.menus">
-            <!-- Disabled in the Problem view and Git Repositories view -->
-            <menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-                  <command commandId="com.tlcsdm.eclipse.openexplorer.actions.popupMenuAction"
-                        label="Open Explorer" icon="icons/openexplorer16.png"
-                        tooltip="Open Explorer" style="push">
-                        <visibleWhen>
-                              <with variable="activePartId">
-                                    <not>
-                                          <or>
-                                                <equals value="org.eclipse.ui.views.ProblemView" />
-                                                <equals value="org.eclipse.egit.ui.RepositoriesView" />
-                                          </or>
-                                    </not>
-                              </with>
-                        </visibleWhen>
-                  </command>
-            </menuContribution>
+	<extension point="org.eclipse.ui.preferencePages">
+		<page
+			name="Open Explorer"
+			class="com.tlcsdm.eclipse.openexplorer.preferences.HomePreferencePage"
+			id="com.tlcsdm.eclipse.openexplorer.preferences.HomePreferencePage">
+		</page>
+		<page
+			id="com.tlcsdm.eclipse.openexplorer.preferences.FMPreferencePage"
+			class="com.tlcsdm.eclipse.openexplorer.preferences.FMPreferencePage"
+			name="File Manager"
+			category="com.tlcsdm.eclipse.openexplorer.preferences.HomePreferencePage">
+		</page>
+	</extension>
+	<extension point="org.eclipse.core.runtime.preferences">
+		<initializer
+			class="com.tlcsdm.eclipse.openexplorer.preferences.PreferenceInitializer">
+		</initializer>
+	</extension>
+	<extension point="org.eclipse.ui.commands">
+		<category id="com.tlcsdm.eclipse.openexplorer.Category"
+			name="Open Explorer">
+		</category>
+		<command categoryId="com.tlcsdm.eclipse.openexplorer.Category"
+			defaultHandler="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorerAction"
+			id="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorer"
+			name="&amp;OpenExplorer Action">
+		</command>
+		<command categoryId="com.tlcsdm.eclipse.openexplorer.Category"
+			defaultHandler="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorerPopupAction"
+			id="com.tlcsdm.eclipse.openexplorer.actions.popupMenuAction"
+			name="Open Explorer">
+		</command>
+	</extension>
+	<extension point="org.eclipse.ui.menus">
+		<!-- Disabled in the Problem view and Git Repositories view -->
+		<menuContribution
+			locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+			<command
+				commandId="com.tlcsdm.eclipse.openexplorer.actions.popupMenuAction"
+				label="Open Explorer" icon="icons/openexplorer16.png"
+				tooltip="Open Explorer" style="push">
+				<visibleWhen>
+					<and>
+						<or>
+							<with variable="activeMenuSelection">
+								<or>
+									<iterate>
+										<adapt
+											type="org.eclipse.core.resources.IResource">
+										</adapt>
+									</iterate>
+									<iterate>
+										<adapt type="java.net.URI">
+										</adapt>
+									</iterate>
+								</or>
+							</with>
+							<with variable="activeMenuSelection">
+								<instanceof
+									value="org.eclipse.jface.text.ITextSelection" />
+							</with>
+						</or>
+						<with variable="activePartId">
+							<not>
+								<or>
+									<equals
+										value="org.eclipse.ui.views.ProblemView" />
+									<equals
+										value="org.eclipse.egit.ui.RepositoriesView" />
+								</or>
+							</not>
+						</with>
+					</and>
+				</visibleWhen>
+			</command>
+		</menuContribution>
 
-            <!-- Toolbar buttons -->
-            <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?befor=additions">
-                  <toolbar id="com.tlcsdm.eclipse.openexplorer.toolbar">
-                        <separator name="com.tlcsdm.eclipse.openexplorer.group.openexplorer" visible="true"/>
-                        <command commandId="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorer"
-                              label="Open Explorer" icon="icons/openexplorer16.png" style="push" />
-                  </toolbar>
-            </menuContribution>
-      </extension>
+		<!-- Toolbar buttons -->
+		<menuContribution
+			locationURI="toolbar:org.eclipse.ui.main.toolbar?befor=additions">
+			<toolbar id="com.tlcsdm.eclipse.openexplorer.toolbar">
+				<separator
+					name="com.tlcsdm.eclipse.openexplorer.group.openexplorer"
+					visible="true" />
+				<command
+					commandId="com.tlcsdm.eclipse.openexplorer.actions.OpenExplorer"
+					label="Open Explorer" icon="icons/openexplorer16.png"
+					style="push" />
+			</toolbar>
+		</menuContribution>
+	</extension>
+	
+	<extension point="org.eclipse.help.toc">
+		<toc file="help/help_toc.xml" primary="true"/>
+	</extension>
+	   <extension
+          point="org.eclipse.help.contexts">
+      <contexts
+            file="help/help_contexts.xml"
+            plugin="com.tlcsdm.eclipse.openexplorer">
+      </contexts>
+   </extension>
 
 </plugin>
