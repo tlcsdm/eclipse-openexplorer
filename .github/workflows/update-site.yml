@@ -22,7 +22,10 @@ jobs:
 
       - name: Copy update site content to update_site/
         run: |
-          cp -rf $(find sites -type d -path 'sites/*/target/repository' | head -n 1)/* update_site/
+          rm -rf update_site/*
+          cp -r $(find sites -type d -path 'sites/*/target/repository' | head -n 1)/* update_site/
+        # 当前只支持最新版本，要支持历史版本需要保留完整的p2 repository
+        #   cp -rf $(find sites -type d -path 'sites/*/target/repository' | head -n 1)/* update_site/
 
       - name: Configure git
         run: |
