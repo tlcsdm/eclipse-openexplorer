@@ -5,7 +5,7 @@
 
     <groupId>com.tlcsdm.eclipse.openexplorer</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -43,6 +43,14 @@
                     <target>
                         <file>../../target-platform.target</file>
                     </target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-packaging-plugin</artifactId>
+                <version>${tycho.version}</version>
+                <configuration>
+                    <timestampProvider>default</timestampProvider>
                 </configuration>
             </plugin>
             <plugin>
