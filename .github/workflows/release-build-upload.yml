@@ -18,20 +18,12 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      - name: Import GPG key
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.ECLIPSE_GPG_PRIVATE_KEY }}
-        run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import --yes --quiet --no-tty
-          gpg --list-keys
-
-      - name: Build with Maven Tycho (with PGP signing)
-        env:
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.ECLIPSE_GPG_PASSPHRASE }}
-          GPG_KEY_ID: ${{ secrets.ECLIPSE_GPG_KEY_ID }}
-        run: |
-          mvn -B clean verify -ntp -DskipTests -Psign \
-            -Dgpg.keyname="${GPG_KEY_ID}"
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: '3.9.9'
+      - name: Build with Maven
+        run: mvn -B clean verify -ntp -DskipTests
 
       - name: Upload artifact to release
         uses: softprops/action-gh-release@v2
