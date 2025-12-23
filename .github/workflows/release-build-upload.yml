@@ -22,8 +22,20 @@ jobs:
         uses: stCarolas/setup-maven@v5
         with:
           maven-version: '3.9.9'
-      - name: Build with Maven
-        run: mvn -B clean verify -ntp -DskipTests
+      - name: Import GPG key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.ECLIPSE_GPG_PRIVATE_KEY }}
+        run: |
+          if [ -z "${GPG_PRIVATE_KEY}" ]; then echo "GPG_PRIVATE_KEY is required"; exit 1; fi
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import --yes --quiet --no-tty --pinentry-mode loopback
+
+      - name: Build with Maven (PGP signing)
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.ECLIPSE_GPG_PASSPHRASE }}
+          GPG_KEY_ID: ${{ secrets.ECLIPSE_GPG_KEY_ID }}
+        run: |
+          if [ -z "${GPG_KEY_ID}" ]; then echo "GPG_KEY_ID is required"; exit 1; fi
+          mvn -B clean verify -ntp -DskipTests -Psign -Dgpg.keyname="${GPG_KEY_ID}"
 
       - name: Upload artifact to release
         uses: softprops/action-gh-release@v2
