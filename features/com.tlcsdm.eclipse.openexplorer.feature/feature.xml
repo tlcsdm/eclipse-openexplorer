@@ -296,8 +296,8 @@ version(s), and exceptions or additional permissions here}.&quot;
    </license>
 
    <url>
-      <update label="%updateSiteName" url="https://raw.githubusercontent.com/tlcsdm/eclipse-openexplorer/master/update_site/"/>
-      <discovery label="Open Explorer Update Site" url="https://raw.githubusercontent.com/tlcsdm/eclipse-openexplorer/master/update_site/"/>
+      <update label="%updateSiteName" url="https://raw.githubusercontent.com/tlcsdm/eclipse-openexplorer/update_site/"/>
+      <discovery label="Open Explorer Update Site" url="https://raw.githubusercontent.com/tlcsdm/eclipse-openexplorer/update_site/"/>
    </url>
 
    <requires>
