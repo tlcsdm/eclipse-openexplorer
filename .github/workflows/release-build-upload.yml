@@ -39,8 +39,13 @@ jobs:
 
       - name: Prepare update site content
         run: |
+          REPO_DIR="sites/com.tlcsdm.eclipse.openexplorer.site/target/repository"
+          if [ ! -d "${REPO_DIR}" ]; then
+            echo "Error: Repository directory not found at ${REPO_DIR}"
+            exit 1
+          fi
           mkdir -p /tmp/update_site
-          cp -r $(find sites -type d -path 'sites/*/target/repository' | head -n 1)/* /tmp/update_site/
+          cp -r "${REPO_DIR}"/* /tmp/update_site/
 
       - name: Deploy to update_site branch
         uses: peaceiris/actions-gh-pages@v4
