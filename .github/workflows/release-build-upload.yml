@@ -37,6 +37,20 @@ jobs:
           if [ -z "${GPG_KEY_ID}" ]; then echo "GPG_KEY_ID is required"; exit 1; fi
           mvn -B clean verify -ntp -DskipTests -Psign -Dgpg.keyname="${GPG_KEY_ID}"
 
+      - name: Prepare update site content
+        run: |
+          mkdir -p /tmp/update_site
+          cp -r $(find sites -type d -path 'sites/*/target/repository' | head -n 1)/* /tmp/update_site/
+
+      - name: Deploy to update_site branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /tmp/update_site
+          publish_branch: update_site
+          force_orphan: true
+          commit_message: 'build: Update update_site with release ${{ github.event.release.tag_name }} (PGP signed)'
+
       - name: Upload artifact to release
         uses: softprops/action-gh-release@v2
         with:
