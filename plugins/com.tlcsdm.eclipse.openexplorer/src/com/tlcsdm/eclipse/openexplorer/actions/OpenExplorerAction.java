@@ -40,6 +40,7 @@ public class OpenExplorerAction extends AbstractOpenExplorerAction implements
 
     @Override
     public void dispose() {
+        // Delegates to AbstractOpenExplorerAction.dispose() for listener cleanup
         super.dispose();
     }
 

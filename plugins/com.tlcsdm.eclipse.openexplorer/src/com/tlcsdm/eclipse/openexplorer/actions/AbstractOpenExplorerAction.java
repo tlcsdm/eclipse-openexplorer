@@ -82,20 +82,12 @@ public abstract class AbstractOpenExplorerAction extends AbstractHandler
 		}
 	}
 
-	/**
-	 * Removes the property change listener registered by this action. Subclasses
-	 * should call {@code super.dispose()} if they override this method.
-	 */
-	protected void removePropertyChangeListener() {
+	@Override
+	public void dispose() {
 		Activator activator = Activator.getDefault();
 		if (activator != null) {
 			activator.getPreferenceStore().removePropertyChangeListener(this);
 		}
-	}
-
-	@Override
-	public void dispose() {
-		removePropertyChangeListener();
 		super.dispose();
 	}
 
