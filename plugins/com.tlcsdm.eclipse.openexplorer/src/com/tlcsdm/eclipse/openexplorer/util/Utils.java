@@ -26,11 +26,19 @@ package com.tlcsdm.eclipse.openexplorer.util;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Platform;
+
 /**
  * @author <a href="mailto:samson959@gmail.com">Samson Wu</a>
  * @version 1.5.0
  */
 public class Utils {
+
+	private static final ILog LOG = Platform.getLog(Utils.class);
+
+	private Utils() {
+	}
 
 	/**
 	 * Use {@code which} command to found the modern file manager, if not found use
@@ -39,48 +47,33 @@ public class Utils {
 	 * @return the file manager
 	 */
 	public static String detectLinuxSystemBrowser() {
-		String result = executeCommand("which nautilus");
-		if (result == null || result.trim().equals("")) {
-			result = executeCommand("which dolphin");
+		String[] fileManagers = { "nautilus", "dolphin", "thunar", "pcmanfm", "rox", "xdg-open" };
+		for (String fm : fileManagers) {
+			String result = executeCommand("which " + fm);
+			if (result != null && !result.isEmpty()) {
+				String[] pathnames = result.split(File.separator);
+				return pathnames[pathnames.length - 1];
+			}
 		}
-		if (result == null || result.trim().equals("")) {
-			result = executeCommand("which thunar");
-		}
-		if (result == null || result.trim().equals("")) {
-			result = executeCommand("which pcmanfm");
-		}
-		if (result == null || result.trim().equals("")) {
-			result = executeCommand("which rox");
-		}
-		if (result == null || result.trim().equals("")) {
-			result = executeCommand("xdg-open");
-		}
-		if (result == null || result.trim().equals("")) {
-			result = IFileManagerExecutables.OTHER;
-		}
-		String[] pathnames = result.split(File.separator);
-		return pathnames[pathnames.length - 1];
+		return IFileManagerExecutables.OTHER;
 	}
 
 	/**
-	 * execute the command and return the result.
+	 * Execute the command and return the result.
 	 * 
-	 * @param command
-	 * @return
+	 * @param command the command to execute
+	 * @return the trimmed stdout output, or null if the command failed
 	 */
 	public static String executeCommand(String command) {
-		String stdout = null;
 		try {
 			ProcessBuilder builder = new ProcessBuilder(command.split(" "));
 			Process process = builder.start();
-			stdout = IOUtils.toString(process.getInputStream());
-			stdout = stdout.trim();
-			stdout = stdout.replace("\n", "");
-			stdout = stdout.replace("\r", "");
+			String stdout = new String(process.getInputStream().readAllBytes()).trim();
+			return stdout.isEmpty() ? null : stdout;
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOG.warn("Failed to execute command: " + command, e);
+			return null;
 		}
-		return stdout;
 	}
 
 }

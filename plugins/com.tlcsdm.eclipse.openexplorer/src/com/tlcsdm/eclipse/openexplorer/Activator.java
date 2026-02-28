@@ -19,7 +19,6 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 	/** The plug-in ID */
 	public static final String PLUGIN_ID = "com.tlcsdm.eclipse.openexplorer"; //$NON-NLS-1$
-	public static final String VERSION = "1.0.3";
 
 	// The shared instance
 	private static Activator plugin;
@@ -28,7 +27,6 @@ public class Activator extends AbstractUIPlugin {
 	 * The constructor
 	 */
 	public Activator() {
-		plugin = this;
 	}
 
 	/**
@@ -40,23 +38,21 @@ public class Activator extends AbstractUIPlugin {
 		return plugin;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.
-	 * BundleContext)
+	/**
+	 * Returns the version of this plug-in bundle.
+	 *
+	 * @return the bundle version string
 	 */
+	public static String getVersion() {
+		return plugin != null ? plugin.getBundle().getVersion().toString() : "";
+	}
+
 	@Override
 	public void start(BundleContext context) throws Exception {
+		plugin = this;
 		super.start(context);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;

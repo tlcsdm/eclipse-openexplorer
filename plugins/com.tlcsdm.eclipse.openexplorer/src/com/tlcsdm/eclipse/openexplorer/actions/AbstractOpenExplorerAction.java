@@ -30,6 +30,9 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -58,98 +61,84 @@ import com.tlcsdm.eclipse.openexplorer.util.OperatingSystem;
  */
 public abstract class AbstractOpenExplorerAction extends AbstractHandler
 		implements IActionDelegate, IPropertyChangeListener {
+
+	private static final ILog LOG = Platform.getLog(AbstractOpenExplorerAction.class);
+
 	protected IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 	protected Shell shell;
 	protected ISelection currentSelection;
 
 	protected String systemBrowser;
 
-	public AbstractOpenExplorerAction() {
+	protected AbstractOpenExplorerAction() {
 		this.systemBrowser = OperatingSystem.INSTANCE.getSystemBrowser();
 		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse
-	 * .jface.util.PropertyChangeEvent)
-	 */
+	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		if (OperatingSystem.INSTANCE.isLinux()) {
 			this.systemBrowser = OperatingSystem.INSTANCE.getSystemBrowser();
 		}
 	}
 
+	/**
+	 * Removes the property change listener registered by this action. Subclasses
+	 * should call {@code super.dispose()} if they override this method.
+	 */
+	protected void removePropertyChangeListener() {
+		Activator activator = Activator.getDefault();
+		if (activator != null) {
+			activator.getPreferenceStore().removePropertyChangeListener(this);
+		}
+	}
+
+	@Override
+	public void dispose() {
+		removePropertyChangeListener();
+		super.dispose();
+	}
+
+	@Override
 	public void run(IAction action) {
 		if (this.currentSelection == null || this.currentSelection.isEmpty()) {
 			return;
 		}
-		if (this.currentSelection instanceof ITreeSelection) {
-			ITreeSelection treeSelection = (ITreeSelection) this.currentSelection;
-
-			TreePath[] paths = treeSelection.getPaths();
-
-			for (int i = 0; i < paths.length; i++) {
-				TreePath path = paths[i];
-				IResource resource = null;
-				Object segment = path.getLastSegment();
-				if ((segment instanceof IResource))
-					resource = (IResource) segment;
-				else if ((segment instanceof IJavaElement)) {
-					resource = ((IJavaElement) segment).getResource();
-				}
+		if (this.currentSelection instanceof ITreeSelection treeSelection) {
+			for (TreePath path : treeSelection.getPaths()) {
+				IResource resource = resolveResource(path.getLastSegment());
 				if (resource == null) {
 					continue;
 				}
-				String browser = this.systemBrowser;
-				String location = resource.getLocation().toOSString();
-				if ((resource instanceof IFile)) {
-					location = ((IFile) resource).getParent().getLocation().toOSString();
-					if (OperatingSystem.INSTANCE.isWindows()) {
-						browser = this.systemBrowser + " /select,";
-						location = ((IFile) resource).getLocation().toOSString();
-					}
-				}
-				openInBrowser(browser, location);
+				openResource(resource);
 			}
 		} else if (this.currentSelection instanceof ITextSelection
 				|| this.currentSelection instanceof IStructuredSelection) {
-			// open current editing file
 			IEditorPart editor = window.getActivePage().getActiveEditor();
 			if (editor != null) {
-				IFile current_editing_file = (IFile) editor.getEditorInput().getAdapter(IFile.class);
-				String browser = this.systemBrowser;
-				String location = current_editing_file.getParent().getLocation().toOSString();
-				if (OperatingSystem.INSTANCE.isWindows()) {
-					browser = this.systemBrowser + " /select,";
-					location = current_editing_file.getLocation().toOSString();
+				IFile currentFile = editor.getEditorInput().getAdapter(IFile.class);
+				if (currentFile != null) {
+					openResource(currentFile);
 				}
-				openInBrowser(browser, location);
 			}
 		}
 	}
 
 	protected void openInBrowser(String browser, String location) {
 		try {
-			if (OperatingSystem.INSTANCE.isWindows()) {
-				String[] args = browser.split(" ");
-				String[] fullArgs = new String[args.length + 1];
-				System.arraycopy(args, 0, fullArgs, 0, args.length);
-				fullArgs[args.length] = location;
-				ProcessBuilder processBuilder = new ProcessBuilder(fullArgs);
-				processBuilder.start();
-			} else {
-				Runtime.getRuntime().exec(new String[] { browser, location });
-			}
+			String[] args = browser.split(" ");
+			String[] fullArgs = new String[args.length + 1];
+			System.arraycopy(args, 0, fullArgs, 0, args.length);
+			fullArgs[args.length] = location;
+			new ProcessBuilder(fullArgs).start();
 		} catch (IOException e) {
 			MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.OpenExploer_Error,
 					Messages.Cant_Open + " \"" + location + "\"");
-			e.printStackTrace();
+			LOG.error("Failed to open file browser for: " + location, e);
 		}
 	}
 
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.currentSelection = selection;
 	}
@@ -162,47 +151,53 @@ public abstract class AbstractOpenExplorerAction extends AbstractHandler
 			return null;
 		}
 
-		if (selection instanceof ITreeSelection) {
-			ITreeSelection treeSelection = (ITreeSelection) selection;
-
+		if (selection instanceof ITreeSelection treeSelection) {
 			for (TreePath path : treeSelection.getPaths()) {
-				IResource resource = null;
-				Object segment = path.getLastSegment();
-				if (segment instanceof IResource) {
-					resource = (IResource) segment;
-				} else if (segment instanceof IJavaElement) {
-					resource = ((IJavaElement) segment).getResource();
-				}
-
-				if (resource == null)
+				IResource resource = resolveResource(path.getLastSegment());
+				if (resource == null) {
 					continue;
-
-				String browser = this.systemBrowser;
-				String location = resource.getLocation().toOSString();
-				if (resource instanceof IFile) {
-					location = ((IFile) resource).getParent().getLocation().toOSString();
-					if (OperatingSystem.INSTANCE.isWindows()) {
-						browser = this.systemBrowser + " /select,";
-						location = ((IFile) resource).getLocation().toOSString();
-					}
 				}
-				openInBrowser(browser, location);
+				openResource(resource);
 			}
 		} else if (selection instanceof ITextSelection || selection instanceof IStructuredSelection) {
 			IEditorPart editor = HandlerUtil.getActiveEditor(event);
 			if (editor != null) {
 				IFile currentFile = editor.getEditorInput().getAdapter(IFile.class);
 				if (currentFile != null) {
-					String browser = this.systemBrowser;
-					String location = currentFile.getParent().getLocation().toOSString();
-					if (OperatingSystem.INSTANCE.isWindows()) {
-						browser = this.systemBrowser + " /select,";
-						location = currentFile.getLocation().toOSString();
-					}
-					openInBrowser(browser, location);
+					openResource(currentFile);
 				}
 			}
 		}
 		return null;
+	}
+
+	private IResource resolveResource(Object segment) {
+		if (segment instanceof IResource resource) {
+			return resource;
+		} else if (segment instanceof IJavaElement javaElement) {
+			return javaElement.getResource();
+		}
+		return null;
+	}
+
+	private void openResource(IResource resource) {
+		IPath resourceLocation = resource.getLocation();
+		if (resourceLocation == null) {
+			return;
+		}
+		String browser = this.systemBrowser;
+		String location = resourceLocation.toOSString();
+		if (resource instanceof IFile file) {
+			IPath parentLocation = file.getParent().getLocation();
+			if (parentLocation == null) {
+				return;
+			}
+			location = parentLocation.toOSString();
+			if (OperatingSystem.INSTANCE.isWindows()) {
+				browser = this.systemBrowser + " /select,";
+				location = resourceLocation.toOSString();
+			}
+		}
+		openInBrowser(browser, location);
 	}
 }

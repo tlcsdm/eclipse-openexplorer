@@ -38,7 +38,9 @@ public class OpenExplorerAction extends AbstractOpenExplorerAction implements
         this.shell = this.window.getShell();
     }
 
+    @Override
     public void dispose() {
+        super.dispose();
     }
 
 }

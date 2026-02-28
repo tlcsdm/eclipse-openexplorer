@@ -27,7 +27,11 @@ package com.tlcsdm.eclipse.openexplorer.util;
  * @author <a href="mailto:samson959@gmail.com">Samson Wu</a>
  * @version 1.5.0
  */
-public interface IFileManagerExecutables {
+public final class IFileManagerExecutables {
+
+	private IFileManagerExecutables() {
+	}
+
 	public static final String FINDER = "open";
 	public static final String EXPLORER = "explorer";
 	public static final String NAUTILUS = "nautilus";
