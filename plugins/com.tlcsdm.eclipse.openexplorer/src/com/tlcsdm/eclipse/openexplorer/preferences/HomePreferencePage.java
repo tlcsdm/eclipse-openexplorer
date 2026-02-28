@@ -50,7 +50,7 @@ public class HomePreferencePage extends PreferencePage implements IWorkbenchPref
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench) {
-		setDescription(Messages.Open_Explorer_Version + Activator.VERSION);
+		setDescription(Messages.Open_Explorer_Version + Activator.getVersion());
 	}
 
 	/*

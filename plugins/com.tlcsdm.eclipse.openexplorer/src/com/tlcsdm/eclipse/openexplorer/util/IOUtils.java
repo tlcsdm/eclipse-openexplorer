@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 
 /**
  * @author <a href="mailto:rory.cn@gmail.com">Rory</a>
@@ -38,10 +38,13 @@ public class IOUtils {
 
 	private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
+	private IOUtils() {
+	}
+
 	public static long copyLarge(Reader input, Writer output) throws IOException {
 		char[] buffer = new char[DEFAULT_BUFFER_SIZE];
 		long count = 0;
-		int n = 0;
+		int n;
 		while (-1 != (n = input.read(buffer))) {
 			output.write(buffer, 0, n);
 			count += n;
@@ -58,13 +61,12 @@ public class IOUtils {
 	}
 
 	public static void copy(InputStream input, Writer output) throws IOException {
-		InputStreamReader in = new InputStreamReader(input);
-		copy(in, output);
+		try (InputStreamReader in = new InputStreamReader(input)) {
+			copy(in, output);
+		}
 	}
 
 	public static String toString(InputStream input) throws IOException {
-		StringWriter sw = new StringWriter();
-		copy(input, sw);
-		return sw.toString();
+		return new String(input.readAllBytes(), Charset.defaultCharset());
 	}
 }
