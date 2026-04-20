@@ -10,6 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <target.platform.file>targets/2024-06.target</target.platform.file>
     </properties>
 
     <modules>
@@ -41,7 +42,7 @@
                 <version>${tycho.version}</version>
                 <configuration>
                     <target>
-                        <file>../../target-platform.target</file>
+                        <file>../../${target.platform.file}</file>
                     </target>
                 </configuration>
             </plugin>
