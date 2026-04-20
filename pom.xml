@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <target.platform.file>targets/2024-06.target</target.platform.file>
+        <target.platform.file>target-platform.target</target.platform.file>
     </properties>
 
     <modules>

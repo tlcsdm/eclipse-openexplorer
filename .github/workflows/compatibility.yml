@@ -8,13 +8,7 @@ on:
       - 'LICENSE'
       - '.gitignore'
       - '.gitattributes'
-      - '.github/ISSUE_TEMPLATE/**'
-      - '.github/dependabot.yml'
-      - '.github/workflows/sync-gitee.yml'
-      - '.github/workflows/update-site.yml'
-      - '.github/workflows/release-build-upload.yml'
-      - '.github/workflows/artifact.yml'
-      - '.github/workflows/maven.yml'
+      - '.github/**'
   workflow_dispatch:
 
 permissions:
