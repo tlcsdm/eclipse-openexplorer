@@ -44,4 +44,5 @@ jobs:
       with:
         maven-version: '3.9.9'
     - name: Build with Maven against Eclipse ${{ matrix.target }}
+      # 2025-03+ repos include JavaSE-21 IUs. When adding future targets, review this split and adjust as needed.
       run: mvn -B clean verify -ntp "-Dtarget.platform.file=targets/${{ matrix.target }}.target" "-Dtarget.resolve.with.ee.constraints=${{ startsWith(matrix.target, '2024-') && 'true' || 'false' }}"
