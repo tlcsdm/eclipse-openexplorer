@@ -44,4 +44,4 @@ jobs:
       with:
         maven-version: '3.9.9'
     - name: Build with Maven against Eclipse ${{ matrix.target }}
-      run: mvn -B clean verify -ntp "-Dtarget.platform.file=targets/${{ matrix.target }}.target"
+      run: mvn -B clean verify -ntp "-Dtarget.platform.file=targets/${{ matrix.target }}.target" "-Dtarget.resolve.with.ee.constraints=${{ startsWith(matrix.target, '2024-') && 'true' || 'false' }}"
