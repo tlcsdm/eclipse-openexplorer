@@ -11,7 +11,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <target.platform.file>target-platform.target</target.platform.file>
-        <!-- Keep strict EE checks by default. Compatibility workflow overrides this for newer Eclipse targets that require Java 21. -->
+        <!-- Plugin is currently developed with JavaSE-17, so strict EE checks stay enabled by default. -->
         <target.resolve.with.ee.constraints>true</target.resolve.with.ee.constraints>
     </properties>
 
