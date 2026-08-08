@@ -7,10 +7,9 @@ Eclipse releases quarterly: March (03), June (06), September (09), December (12)
 import os
 import re
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 import urllib.request
-import xml.etree.ElementTree as ET
 
 
 def get_eclipse_release_versions():
@@ -181,7 +180,7 @@ def main():
     
     # Process the newest available version
     # (only add one at a time to make PRs manageable)
-    new_version = available_new_versions[0]
+    new_version = available_new_versions[-1]  # Take the newest version
     
     print(f"Adding support for Eclipse {new_version}...")
     print()
