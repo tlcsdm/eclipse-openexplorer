@@ -189,9 +189,9 @@ def main():
             print("Note: GITHUB_OUTPUT not set (local testing)")
         return 0
     
-    # Process the newest available version
-    # (only add one at a time to make PRs manageable)
-    new_version = sorted(available_new_versions)[-1]  # Explicitly sort and take the newest
+    # Process the oldest available version first
+    # This ensures we add releases incrementally and don't skip any
+    new_version = sorted(available_new_versions)[0]  # Take the oldest new version
     
     print(f"Adding support for Eclipse {new_version}...")
     print()
