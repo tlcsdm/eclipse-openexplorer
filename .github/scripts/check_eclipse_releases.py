@@ -107,7 +107,12 @@ def update_compatibility_workflow(new_version):
     match = re.search(matrix_pattern, content)
     
     if not match:
-        print("✗ Could not find matrix target section in compatibility.yml")
+        error_msg = (
+            "Could not find matrix target section in compatibility.yml. "
+            "The file may have been reformatted or restructured. "
+            "Please check the workflow file manually."
+        )
+        print(f"✗ {error_msg}")
         return False
     
     prefix = match.group(1)
@@ -152,8 +157,11 @@ def main():
     if not new_versions:
         print("✓ All known Eclipse releases already have target files.")
         # Set output for GitHub Actions
-        with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
-            f.write("changes=false\n")
+        if 'GITHUB_OUTPUT' in os.environ:
+            with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                f.write("changes=false\n")
+        else:
+            print("Note: GITHUB_OUTPUT not set (local testing)")
         return 0
     
     print(f"Checking {len(new_versions)} potential new releases...")
@@ -174,13 +182,16 @@ def main():
     if not available_new_versions:
         print("✓ No new Eclipse releases found.")
         # Set output for GitHub Actions
-        with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
-            f.write("changes=false\n")
+        if 'GITHUB_OUTPUT' in os.environ:
+            with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                f.write("changes=false\n")
+        else:
+            print("Note: GITHUB_OUTPUT not set (local testing)")
         return 0
     
     # Process the newest available version
     # (only add one at a time to make PRs manageable)
-    new_version = available_new_versions[-1]  # Take the newest version
+    new_version = sorted(available_new_versions)[-1]  # Explicitly sort and take the newest
     
     print(f"Adding support for Eclipse {new_version}...")
     print()
@@ -207,9 +218,13 @@ def main():
     print(f"  - Updated .github/workflows/compatibility.yml")
     
     # Set output for GitHub Actions
-    with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
-        f.write("changes=true\n")
-        f.write(f"new_version={new_version}\n")
+    if 'GITHUB_OUTPUT' in os.environ:
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            f.write("changes=true\n")
+            f.write(f"new_version={new_version}\n")
+    else:
+        print()
+        print("Note: GITHUB_OUTPUT not set (local testing)")
     
     return 0
 
