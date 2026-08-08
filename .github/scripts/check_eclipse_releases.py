@@ -71,24 +71,37 @@ def get_existing_targets():
     return sorted(versions)
 
 
-def create_target_file(version):
-    """Create a new target file for the given Eclipse version."""
-    target_content = f"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?>
-<target includeMode="feature" name="target-platform">
-    <locations>
-        <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
-            <repository location="https://mirrors.aliyun.com/eclipse/releases/{version}/"/>
-            <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
-            <unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
-        </location>
-    </locations>
-</target>
-"""
+def get_latest_target_file():
+    """Get the path to the latest existing target file."""
+    existing_versions = get_existing_targets()
+    if not existing_versions:
+        return None
     
+    latest_version = sorted(existing_versions)[-1]
+    return Path(f"targets/{latest_version}.target")
+
+
+def create_target_file(version):
+    """Create a new target file for the given Eclipse version based on the latest existing target."""
+    # Get the latest existing target file to use as a template
+    latest_target = get_latest_target_file()
+    
+    if latest_target is None or not latest_target.exists():
+        print("✗ No existing target file found to use as template")
+        return None
+    
+    # Read the latest target file
+    target_content = latest_target.read_text(encoding='utf-8')
+    
+    # Replace the version in the repository location URL
+    # This regex pattern matches the Eclipse release version in the repository URL
+    version_pattern = r'(https://mirrors\.aliyun\.com/eclipse/releases/)(\d{4}-\d{2})(/)'
+    target_content = re.sub(version_pattern, rf'\g<1>{version}\g<3>', target_content)
+    
+    # Write the new target file
     target_file = Path(f"targets/{version}.target")
     target_file.write_text(target_content, encoding='utf-8')
-    print(f"✓ Created target file: {target_file}")
+    print(f"✓ Created target file: {target_file} (based on {latest_target.name})")
     return target_file
 
 
