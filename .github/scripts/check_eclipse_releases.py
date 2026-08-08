@@ -87,7 +87,7 @@ def create_target_file(version):
 """
     
     target_file = Path(f"targets/{version}.target")
-    target_file.write_text(target_content)
+    target_file.write_text(target_content, encoding='utf-8')
     print(f"✓ Created target file: {target_file}")
     return target_file
 
@@ -124,7 +124,7 @@ def update_compatibility_workflow(new_version):
     # Check if new version already exists
     if new_version in existing_targets:
         print(f"  Version {new_version} already exists in compatibility.yml")
-        return False
+        return True  # Already up to date, not an error
     
     # Add new version in sorted order
     all_targets = sorted(existing_targets + [new_version])
@@ -133,7 +133,7 @@ def update_compatibility_workflow(new_version):
     # Replace the matrix target section
     new_content = content[:match.start()] + prefix + new_targets_section + content[match.end():]
     
-    workflow_file.write_text(new_content)
+    workflow_file.write_text(new_content, encoding='utf-8')
     print(f"✓ Updated compatibility.yml with version {new_version}")
     return True
 
