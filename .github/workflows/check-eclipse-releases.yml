@@ -51,8 +51,7 @@ jobs:
             ### Changes:
             - Added new target file:
             `targets/${{ steps.check.outputs.new_version }}.target`
-            - Updated `.github/workflows/compatibility.yml` to include
-            the new target in the matrix
+            - Compatibility checks will pick up the new target file automatically
 
             ### Next Steps:
             - Review the changes

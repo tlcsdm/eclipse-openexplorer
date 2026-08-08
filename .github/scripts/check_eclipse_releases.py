@@ -105,52 +105,6 @@ def create_target_file(version):
     return target_file
 
 
-def update_compatibility_workflow(new_version):
-    """Update the compatibility.yml workflow to include the new target version."""
-    workflow_file = Path(".github/workflows/compatibility.yml")
-    
-    if not workflow_file.exists():
-        print(f"✗ Workflow file not found: {workflow_file}")
-        return False
-    
-    content = workflow_file.read_text(encoding='utf-8')
-    
-    # Find the matrix target section
-    matrix_pattern = r'(matrix:\s*\n\s*target:\s*\n)((?:\s*-\s+\d{4}-\d{2}\s*\n)+)'
-    match = re.search(matrix_pattern, content)
-    
-    if not match:
-        error_msg = (
-            "Could not find matrix target section in compatibility.yml. "
-            "The file may have been reformatted or restructured. "
-            "Please check the workflow file manually."
-        )
-        print(f"✗ {error_msg}")
-        return False
-    
-    prefix = match.group(1)
-    targets_section = match.group(2)
-    
-    # Extract existing targets
-    existing_targets = re.findall(r'-\s+(\d{4}-\d{2})', targets_section)
-    
-    # Check if new version already exists
-    if new_version in existing_targets:
-        print(f"  Version {new_version} already exists in compatibility.yml")
-        return True  # Already up to date, not an error
-    
-    # Add new version in sorted order
-    all_targets = sorted(existing_targets + [new_version])
-    new_targets_section = ''.join([f'          - {target}\n' for target in all_targets])
-    
-    # Replace the matrix target section
-    new_content = content[:match.start()] + prefix + new_targets_section + content[match.end():]
-    
-    workflow_file.write_text(new_content, encoding='utf-8')
-    print(f"✓ Updated compatibility.yml with version {new_version}")
-    return True
-
-
 def main():
     """Main function to check for new Eclipse releases and update files."""
     print("Checking for new Eclipse platform releases...")
@@ -216,21 +170,11 @@ def main():
         print(f"✗ Failed to create target file: {e}")
         return 1
     
-    # Update compatibility workflow
-    try:
-        if not update_compatibility_workflow(new_version):
-            print("✗ Failed to update compatibility workflow, aborting")
-            return 1
-    except Exception as e:
-        print(f"✗ Failed to update compatibility.yml: {e}")
-        return 1
-    
     print()
     print(f"✓ Successfully added support for Eclipse {new_version}")
     print()
     print("Changes:")
     print(f"  - Created targets/{new_version}.target")
-    print(f"  - Updated .github/workflows/compatibility.yml")
     
     # Set output for GitHub Actions
     if 'GITHUB_OUTPUT' in os.environ:
