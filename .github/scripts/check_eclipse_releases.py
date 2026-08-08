@@ -205,7 +205,9 @@ def main():
     
     # Update compatibility workflow
     try:
-        update_compatibility_workflow(new_version)
+        if not update_compatibility_workflow(new_version):
+            print("✗ Failed to update compatibility workflow, aborting")
+            return 1
     except Exception as e:
         print(f"✗ Failed to update compatibility.yml: {e}")
         return 1
