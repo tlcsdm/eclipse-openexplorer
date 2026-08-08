@@ -15,14 +15,14 @@ import urllib.request
 def get_eclipse_release_versions():
     """
     Generate list of Eclipse release versions based on quarterly release schedule.
-    Returns versions from 2024-06 onwards up to 2 years in the future.
+    Returns versions from 2024-06 onwards up to 1 year in the future.
     """
     start_year = 2024
     start_month = 6  # Start from 2024-06
     
-    # Calculate end date (current year + 2 years)
+    # Calculate end date (current year + 1 year)
     current_year = datetime.now().year
-    end_year = current_year + 2
+    end_year = current_year + 1
     
     versions = []
     months = [3, 6, 9, 12]  # March, June, September, December
@@ -100,7 +100,7 @@ def update_compatibility_workflow(new_version):
         print(f"✗ Workflow file not found: {workflow_file}")
         return False
     
-    content = workflow_file.read_text()
+    content = workflow_file.read_text(encoding='utf-8')
     
     # Find the matrix target section
     matrix_pattern = r'(matrix:\s*\n\s*target:\s*\n)((?:\s*-\s+\d{4}-\d{2}\s*\n)+)'
